@@ -1,0 +1,18 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2027
+
+From the TaskPaper website (http://hogbaysoftware.com/projects/taskpaper):
+
+  "TaskPaper is a simple to-do list application that helps you stay
+organized. Unlike competing applications, TaskPaper is based on plain text
+files which offer you paper-like simplicity and ease of use." 
+
+TaskPaper is a to-do list application for Mac OS X based on the "Getting
+Things Done" approach of David Allen (http://www.davidco.com/). It supports
+the GTD notions of projects, tasks and contexts.
+
+This package contains a syntax file and a file-type plugin for the simple
+format used by the TaskPaper application. It is intended for Mac users who
+want to edit their TaskPaper lists in Vim from time to time (for example, in
+a SSH session, or on a non-Mac system) and for anyone who is looking for a
+simple to-do list format.
+
