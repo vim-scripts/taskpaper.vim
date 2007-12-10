@@ -1,9 +1,8 @@
-TaskPaper file-type plugin and syntax file
+*taskpaper* TaskPaper file-type plugin and syntax file
 
 David O'Callaghan <david.ocallaghan@cs.tcd.ie>
 
-25th September 2007
-
+10th December 2007
 
 Introduction
 =============
@@ -36,6 +35,16 @@ It contains the following files:
   ftplugin/taskpaper.vim
   syntax/taskpaper.vim
   ftdetect/taskpaper.vim
+
+To access this help file from within Vim you must first update your help 
+tags:
+
+  :helptags ~/.vim/doc
+
+The path may need to be modified depending on where you install to. Once
+you have done this you can access the help with this command:
+
+  :help taskpaper
 
 Syntax
 =======
@@ -118,6 +127,18 @@ from http://www.vimoutliner.org).
 
 Context folding expression was based on a snippet from Vim Tip 282
 (http://vim.sourceforge.net/tips/tip.php?tip_id=282).
+
+Thanks are due to a number of contributors who have supplied suggestions
+or patches to improve TaskPaper.vim:
+
+ *Alexander Wodniok
+    * hint to allow this file to be used as a help file
+ * Ben Armstron 
+    * various fixes that make the scripts more robust
+    * fix to show only complete tag matches
+    * include '_' in contexts
+ * Huahai Yang 
+    * fixed handling of indented tasks
 
 Contact
 ========

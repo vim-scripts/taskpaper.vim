@@ -7,14 +7,19 @@
 " Last Change:  2007 Sep 25
 
 
+if exists("loaded_task_paper")
+    finish
+endif
+let loaded_task_paper = 1
+
 "add '@' to keyword character set so that we can complete contexts as keywords
-set iskeyword+=@-@
+setlocal iskeyword+=@-@
 
 "show tasks from context under the cursor
-function! ShowContext()
+function! s:ShowContext()
     let s:wordUnderCursor = expand("<cword>")
     if(s:wordUnderCursor =~ "@\k*")
-        let @/ = s:wordUnderCursor
+        let @/ = "\\<".s:wordUnderCursor."\\>"
         "adapted from http://vim.sourceforge.net/tips/tip.php?tip_id=282
         set foldexpr=(getline(v:lnum)=~@/)?0:(getline(v:lnum)=~@/)\|\|(getline(v:lnum)=~@/)?0:1
         set foldmethod=expr foldlevel=0 foldcolumn=1 foldminlines=0
@@ -24,19 +29,19 @@ function! ShowContext()
     endif
 endfunction
 
-function! ShowAll()
+function! s:ShowAll()
     set nofoldenable
 endfunction  
 
-function! FoldAllProjects()
+function! s:FoldAllProjects()
     set foldmethod=syntax
     set foldenable
     %foldclose! 
 endfunction
 
 " toggle @done context tag on a task
-function! ToggleDone()
-    if (getline(".") =~ "^\s*- ")
+function! s:ToggleDone()
+    if (getline(".") =~ '^\s*- ')
         let isdone = strridx(getline("."),"@done")
         if (isdone != -1)
             substitute/ @done//
@@ -45,10 +50,19 @@ function! ToggleDone()
             substitute/$/ @done/
             echo "done!"
         endif
+    else 
+        echo "not a task."
     endif
+
 endfunction
 
-map <buffer> <LocalLeader>td :call ToggleDone()<cr>
-map <buffer> <LocalLeader>tc :call ShowContext()<cr>
-map <buffer> <LocalLeader>ta :call ShowAll()<cr>
-map <buffer> <LocalLeader>tp :call FoldAllProjects()<cr>
+" Set up mappings
+noremap <unique> <script> <Plug>ToggleDone       :call <SID>ToggleDone()<CR>
+noremap <unique> <script> <Plug>ShowContext      :call <SID>ShowContext()<CR>
+noremap <unique> <script> <Plug>ShowAll          :call <SID>ShowAll()<CR>
+noremap <unique> <script> <Plug>FoldAllProjects  :call <SID>FoldAllProjects()<CR>
+
+map <buffer> <silent> <LocalLeader>td <Plug>ToggleDone
+map <buffer> <silent> <LocalLeader>tc <Plug>ShowContext
+map <buffer> <silent> <LocalLeader>ta <Plug>ShowAll
+map <buffer> <silent> <LocalLeader>tp <Plug>FoldAllProjects
