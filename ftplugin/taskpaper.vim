@@ -3,8 +3,8 @@
 " Language:	Taskpaper (http://hogbaysoftware.com/projects/taskpaper)
 " Maintainer:	David O'Callaghan <david.ocallaghan@cs.tcd.ie>
 " URL:		http://www.cs.tcd.ie/David.OCallaghan/taskpaper.vim/
-" Version:	1
-" Last Change:  2007 Sep 25
+" Version:	0.3
+" Last Change:  2008-03-03
 
 
 if exists("loaded_task_paper")
@@ -15,27 +15,34 @@ let loaded_task_paper = 1
 "add '@' to keyword character set so that we can complete contexts as keywords
 setlocal iskeyword+=@-@
 
+"set default folding: by project (syntax), open (up to 99 levels), disabled 
+setlocal foldmethod=syntax
+setlocal foldlevel=99
+setlocal nofoldenable
+
 "show tasks from context under the cursor
 function! s:ShowContext()
     let s:wordUnderCursor = expand("<cword>")
     if(s:wordUnderCursor =~ "@\k*")
         let @/ = "\\<".s:wordUnderCursor."\\>"
         "adapted from http://vim.sourceforge.net/tips/tip.php?tip_id=282
-        set foldexpr=(getline(v:lnum)=~@/)?0:(getline(v:lnum)=~@/)\|\|(getline(v:lnum)=~@/)?0:1
-        set foldmethod=expr foldlevel=0 foldcolumn=1 foldminlines=0
-        set foldenable
+        setlocal foldexpr=(getline(v:lnum)=~@/)?0:1
+        setlocal foldmethod=expr foldlevel=0 foldcolumn=1 foldminlines=0
+        setlocal foldenable
     else
         echo "'" s:wordUnderCursor "' is not a context."    
     endif
 endfunction
 
 function! s:ShowAll()
-    set nofoldenable
+    setlocal foldmethod=syntax
+    %foldopen!
+    setlocal nofoldenable
 endfunction  
 
 function! s:FoldAllProjects()
-    set foldmethod=syntax
-    set foldenable
+    setlocal foldmethod=syntax
+    setlocal foldenable
     %foldclose! 
 endfunction
 
