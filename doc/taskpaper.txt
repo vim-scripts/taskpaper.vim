@@ -2,10 +2,12 @@
 
 David O'Callaghan <david.ocallaghan@cs.tcd.ie>
 
-15th February 2011
+6th March 2012
 
 Introduction
 =============
+
+*Latest version from https://github.com/davidoc/taskpaper.vim*
 
 From the TaskPaper website (<http://hogbaysoftware.com/projects/taskpaper>):
 
@@ -29,12 +31,13 @@ Installation
 It should be safe to simply unpack the package into your .vim directory.
 It contains the following files:
 
-    doc/taskpaper.txt
+    autoload/taskpaper.vim
     doc/example.taskpaper
+    doc/taskpaper.txt
     doc/taskpaper_licence.txt
+    ftdetect/taskpaper.vim
     ftplugin/taskpaper.vim
     syntax/taskpaper.vim
-    ftdetect/taskpaper.vim
 
 To access this help file from within Vim you must first update your help 
 tags:
@@ -51,10 +54,9 @@ Syntax
 
 The syntax file highlights project headings and task contexts (tags), and
 "greys out" completed tasks. The exact style of the displayed file depends
-on your Vim colour scheme. 
+on your Vim colour scheme.
 
-A project heading is a piece of text ending in a colon.  Projects can be
-folded using the "syntax" foldmethod.
+A project heading is a piece of text ending in a colon.
 
 A task is a line beginning with a hyphen '-' and can have zero or more
 context tags.
@@ -67,18 +69,28 @@ File-type Plugin
 =================
 
 The file-type plugin tries to make editing TaskPaper files in Vim more
-comfortable. 
+comfortable.
 
 Vim can complete context names after the '@' using the keyword completion
 commands (e.g. Ctrl-X Ctrl-N).
 
-The plugin defines some new mappings: 
+The plugin defines some new mappings:
 
     \td     Mark task as done
     \tx     Mark task as cancelled
-    \tc     Show all tasks with context under cursor
+    \tt     Mark task as today
+    \tD     Archive @done items
+    \tX     Show tasks marked as cancelled
+    \tT     Show tasks marked as today
+    \t/     Search for items including keyword
+    \ts     Search for items including tag
     \tp     Fold all projects
-    \ta     Show all projects and tasks
+    \t.     Fold all notes
+    \tP     Focus on the current project
+    \tj     Go to next project
+    \tk     Go to previous project
+    \tg     Go to specified project
+    \tm     Move task to specified project
 
 Note: if `<Leader>` has been changed (e.g. `:let mapleader=",,"`)
 then its value should be used instead of `\` in the mappings.
@@ -86,17 +98,21 @@ then its value should be used instead of `\` in the mappings.
 Marking a task as done will add the "@done" context tag to the end of the
 task, and it will be greyed out by the syntax file.
 
-To show all tasks with a particular context tag, move the cursor over the
-desired context tag (e.g. using movement or search commands) and then use
-the `\tc` command. This will fold all the irrelevant tasks leaving only the
-tasks in the current context visible.
+To show all tasks with a particular context tag, type `\ts` and a tag name to
+search.  If you use the `\ts` command over the desired context tag, the tag
+name is set as default value.  This will fold all the irrelevant tasks leaving
+only the tasks in the current context visible.
 
-To fold all projects leaving only the headings visible use the `\tp` command.
-Standard fold commands can be used to open (`zo`) and close (`zc`) individual
-projects.
+To fold all top-level projects leaving only the headings visible use the `\tp`
+command. Standard fold commands can be used to open (`zo`) and close (`zc`)
+individual projects.
 
-To show all projects and tasks use the `\ta` command. This disables folding so
+To show all projects and tasks use the `zR` command. This disables folding so
 that the entire file is expanded.
+
+To go to next or previous project use the `\tj` command or `\tk` command.  To
+go to a project you specify use the `\tg` command.  You can complete project
+names with <Tab> on prompt.
 
 Configuration
 ==============
@@ -108,16 +124,91 @@ define the `task_paper_date_format` variable. The format matches your system's
 For example, to include the date and time in ISO8601 format:
 
     let g:task_paper_date_format = "%Y-%m-%dT%H:%M:%S%z"
+
+To change the default archive project name, define the
+`task_paper_archive_project` variable.  The default value is "Archive".
+
+    let g:task_paper_archive_project = "Archive"
+
+By default, when you move a task, the cursor will follow that task to its new location.
+To make the cursor stay in it's current location, change the `task_paper_follow_move` variable.
+
+    let g:task_paper_follow_move = 0
+
+If you want to hide done tasks when searching you can change the `task_paper_search_hide_done` variable.
+
+    let g:task_paper_search_hide_done = 1
+
 File-type Detection
 ====================
 
 This package also contains a script to automatically use the TaskPaper file
 type for all files with the ".taskpaper" extension.
 
+Customize
+==========
+
+You can create your own shortcut for tagging.  To define your own shortcut,
+write settings in ~/.vim/ftplugin/taskpaper.vim or ~/.vimrc.  If you use the
+.vimrc file, define settings like:
+
+    function! s:taskpaper_setup()
+    " Your settings
+    nnoremap <buffer> <silent> <Leader>tn
+    \    :<C-u>call taskpaper#toggle_tag('next', '')<CR>
+    endfunction
+
+    augroup vimrc-taskpaper
+    autocmd!
+    autocmd FileType taskpaper call s:taskpaper_setup()
+    augroup END
+
+To add a tag without argument:
+
+    nnoremap <buffer> <silent> <Leader>tn
+    \    :<C-u>call taskpaper#add_tag('next', '')<CR>
+
+To delete a tag:
+
+    nnoremap <buffer> <silent> <Leader>tN
+    \    :<C-u>call taskpaper#delete_tag('next', '')<CR>
+
+To toggle a tag:
+
+    nnoremap <buffer> <silent> <Leader>tn
+    \    :<C-u>call taskpaper#toggle_tag('next', '')<CR>
+
+To add a tag with an argument:
+
+    nnoremap <buffer> <silent> <Leader>tq
+    \    :<C-u>call taskpaper#add_tag('priority')<CR>
+
+You can specify the priority value on prompt.
+
+To delete the priority tag with any argument:
+
+    nnoremap <buffer> <silent> <Leader>tQ
+    \    :<C-u>call taskpaper#delete_tag('priority', '')<CR>
+
+To delete only the level 1 of priority tag:
+
+    nnoremap <buffer> <silent> <Leader>tQ
+    \    :<C-u>call taskpaper#delete_tag('priority', '1')<CR>
+
+To toggle a tag with an argument:
+
+    nnoremap <buffer> <silent> <Leader>tq
+    \    :<C-u>call taskpaper#toggle_tag('priority')<CR>
+
+To update a tag (not delete if the tag exists):
+
+    nnoremap <buffer> <silent> <Leader>tq
+    \    :<C-u>call taskpaper#update_tag('priority')<CR>
+
 Licence
 ========
 
-Copyright (C) 2007--2011 by David O'Callaghan <david.ocallaghan@cs.tcd.ie>
+Copyright (C) 2007--2012 by David O'Callaghan <david.ocallaghan@cs.tcd.ie>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -167,6 +258,25 @@ or patches to improve TaskPaper.vim:
  * Morgan Sutherland (https://github.com/msutherl)
    - Use <Leader> rather than <LocalLeader>
    - Start new task after <CR>
+ * Matt Sacks (https://github.com/mattsa)
+   - Optional (date) syntax for @done tasks
+   - Add Tag command for add/removing tag
+   - Fix lagging space after removing a tag
+   - Better syntax 
+ * Anyakichi (https://github.com/anyakichi)
+   - Add useful functions for users to define his own mappings easily
+    - Add, delete, toggle, and update tags
+    - Go previous or next project
+    - Move projects, tasks and notes to another project
+    - Search for keywords or tags with regexp
+   - More compatible with HogBaySoftware's TaskPaper
+    - Tag to projects and notes not only tasks
+    - Shortcut to @today tag
+    - Archiving done support
+   - Multi-level folding of projects work perfectly
+   - Add a new feature to fold only notes
+
+
 
 Contact
 ========

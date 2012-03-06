@@ -2,7 +2,7 @@
 " Language:	Taskpaper (http://hogbaysoftware.com/projects/taskpaper)
 " Maintainer:	David O'Callaghan <david.ocallaghan@cs.tcd.ie>
 " URL:		https://github.com/davidoc/taskpaper.vim
-" Last Change:  2011-02-15
+" Last Change:  2012-02-08
 
 if version < 600
   syntax clear
@@ -18,15 +18,12 @@ endif
 
 syn case ignore
 
-syn match  taskpaperComment "^.*$"
-syn match  taskpaperProject       /^.\+:\s*$/
-syn match  taskpaperLineContinue ".$" contained
-syn match  taskpaperListItem  "^\s*[-+]\s\+" 
-syn match  taskpaperContext  "@[A-Za-z0-9_]\+"
-syn match  taskpaperDone "^\s*[-+]\s\+.*@[Dd]one.*$"
-syn match  taskpaperCancelled "^\s*[-+]\s\+.*@[Cc]ancelled.*$"
-
-syn region taskpaperProjectFold start=/^.\+:\s*$/ end=/^\s*$/ transparent fold
+syn match taskpaperComment	/^.*$/ contains=taskpaperContext
+syn match taskpaperProject	/^.\+:\(\s\+@[^ \t(]\+\(([^)]*)\)\?\)*$/ contains=taskpaperContext
+syn match taskpaperListItem	/^\t*-\s\+/
+syn match taskpaperContext	/\s\zs@[^ \t(]\+\(([^)]*)\)\?/
+syn match taskpaperDone		/^.*\s@done\(\(\s\|([^)]*)\).*\)\?$/
+syn match taskpaperCancelled	/^.*\s@cancelled\(\(\s\|([^)]*)\).*\)\?$/
 
 syn sync fromstart
 
